@@ -1,0 +1,76 @@
+; @file callDispatcher.x64.hasm
+; @author Alejandro González (@httpyxel)
+; @brief Assembly utilities  to dispatch windows native calls.
+; @version 0.1
+; @date 2024-01-14
+;
+; @copyright 
+;   Copyright (C) 2024  Alejandro González
+;
+;   This program is free software: you can redistribute it and/or modify
+;   it under the terms of the GNU General Public License as published by
+;   the Free Software Foundation, either version 3 of the License, or
+;   (at your option) any later version.
+;
+;   This program is distributed in the hope that it will be useful,
+;   but WITHOUT ANY WARRANTY; without even the implied warranty of
+;   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;   GNU General Public License for more details.
+;
+;   You should have received a copy of the GNU General Public License
+;   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+%ifndef __CALL_DISPATCHER_ASM__
+%define __CALL_DISPATCHER_ASM__
+
+%include "common/asm/common.x64.hasm"
+
+[BITS 64]
+
+; ============== Define symbols =================
+; Exported functions
+GLOBAL __callobf_doCall
+
+EXTERN __callobf_setLastError
+EXTERN __callobf_buildSpoofedCallStack
+
+; ============ Define struct types ==============
+struc DLL_ENTRY
+    .name:              resw 4
+    alignb   4
+    .address:           resw 4
+    alignb   4
+endstruc
+
+struc FUN_ENTRY
+    .hash:              resw 2
+    alignb   4
+    .moduleIndex:       resw 2
+    alignb   4
+    .argCount:          resw 2
+    alignb   4
+    .ssn:               resw 2
+    alignb   4
+    .functionPtr:       resw 4
+    alignb   4
+endstruc
+
+struc DLL_TABLE
+    .count:             resw 2
+    alignb   4
+    .__padding:         resw 2
+    alignb   4
+    .entries:           resb DLL_ENTRY_size ; <struct_name>_size is defined for every struct
+    alignb   4
+endstruc
+
+struc FUN_TABLE
+    .count:             resw 2
+    alignb   4
+    .__padding:         resw 2
+    alignb   4
+    .entries:           resb FUN_ENTRY_size
+    alignb   4
+endstruc
+
+%endif
